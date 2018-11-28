@@ -1,5 +1,6 @@
 package lxpsee.top.controller;
 
+import com.alibaba.fastjson.JSON;
 import lxpsee.top.domain.CallLog;
 import lxpsee.top.domain.CallLogRange;
 import lxpsee.top.hive.HiveCallLogService;
@@ -12,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 
 /**
@@ -26,6 +30,27 @@ public class CallLogSystemController {
     private CallLogService     callLogService;
     @Resource(name = "hiveCallLogService")
     private HiveCallLogService hiveCallLogService;
+
+    /**
+     * ajax 获取hbase数据库中的数据，json返回
+     */
+    @RequestMapping("/json/findAll")
+    public String findAllJson(HttpServletResponse response) {
+        List<CallLog> callLogList = callLogService.findAll();
+        String callLogStr = JSON.toJSONString(callLogList);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("utf-8");
+        try {
+            OutputStream outputStream = response.getOutputStream();
+            outputStream.write(callLogStr.getBytes("utf-8"));
+            outputStream.flush();
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 
     /**
      * 进入查询最近通话记录页面

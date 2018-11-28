@@ -1,13 +1,10 @@
 package lxpsee.top.service.impl;
 
-import lxpsee.top.dao.BaseDao;
 import lxpsee.top.dao.impl.PersonDao;
 import lxpsee.top.domain.Person;
 import lxpsee.top.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
 
 /**
  * The world always makes way for the dreamer
@@ -16,15 +13,11 @@ import javax.annotation.Resource;
 @Service("personService")
 public class PersonServiceImpl extends BaseServiceImpl<Person> implements PersonService {
 
-    @Resource(name = "personDao")
-    public void setDao(BaseDao<Person> dao) {
-        super.setDao(dao);
-    }
-  /*  @Resource(name ="personDao")
-    private PersonDao personDao;*/
-
+    @Autowired
+    private PersonDao personDao;
 
     public String findNameByPhone(String phone) {
-        return null;
+        return personDao.findNameByPhone(phone);
     }
+
 }

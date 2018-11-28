@@ -16,7 +16,9 @@
 <table id="t1" border="1px" class="t-1" style="width: 800px">
     <tr>
         <td>电话1</td>
+        <td>电话1户主</td>
         <td>电话2</td>
+        <td>电话2户主</td>
         <td>主(被)叫</td>
         <td>通话时间</td>
         <td>通话时长</td>
@@ -24,7 +26,9 @@
     <c:forEach items="${callLogs}" var="log">
         <tr>
             <td><c:out value="${log.caller}"/></td>
+            <td><c:out value="${log.callerName}"/></td>
             <td><c:out value="${log.callee}"/></td>
+            <td><c:out value="${log.calleeName}"/></td>
             <td>
                 <c:if test="${log.caller == param.caller}">主叫</c:if>
                 <c:if test="${log.caller != param.caller}">被叫</c:if>
@@ -34,7 +38,7 @@
         </tr>
     </c:forEach>
     <tr>
-        <td colspan="5" style="text-align: right">
+        <td colspan="7" style="text-align: right">
         </td>
     </tr>
 </table>

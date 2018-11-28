@@ -1,7 +1,8 @@
-package lxpsee.top.calllogs;
+package lxpsee.top.calllogs.gendata;
+
+import lxpsee.top.calllogs.utils.PropertiesUtil;
 
 import java.io.FileWriter;
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -10,10 +11,18 @@ import java.util.*;
  * The world always makes way for the dreamer
  * Created by 努力常态化 on 2018/11/19 19:52.
  */
-public class App {
-    private static Random              random       = new Random();
-    private static List<String>        phoneNumbers = new ArrayList<String>();
+public class GenCallLogData {
+    // 定义属性名常量
+    private static final String GEN_DATA_INTERVAL_MS = "gen.data.interval.ms";
+    private static final String CALL_DURATION_FORMAT = "call.duration.format";
+    private static final String CALL_DURATION_MAX    = "call.duration.max";
+    private static final String CALL_TIME_FORMAT     = "call.time.format";
+    private static final String LOG_FILE_PATH        = "log.file";
+    private static final String CALL_YEAR            = "call.year";
+
     private static Map<String, String> callers      = new HashMap<String, String>();
+    private static List<String>        phoneNumbers = new ArrayList<String>();
+    private static Random              random       = new Random();
 
     static {
         callers.put("15810092493", "史玉龙");
@@ -38,20 +47,16 @@ public class App {
     }
 
     public static void main(String[] args) throws Exception {
-        if (args.length == 0 || args == null) {
-            System.out.println("no args");
-            System.exit(-1);
-        }
-        genCallLogs(args[0]);
+        genCallLogs();
     }
 
-    private static void genCallLogs(String logFile) throws Exception {
-//        FileWriter fileWriter = new FileWriter("D:/workDir/otherFile/scala/callLog/callLog.log", true);
-        FileWriter fileWriter = new FileWriter(logFile, true);
+    private static void genCallLogs() throws Exception {
+        FileWriter fileWriter = new FileWriter(PropertiesUtil.getStrPro(LOG_FILE_PATH), true);
+        DecimalFormat decimalFormat = new DecimalFormat(PropertiesUtil.getStrPro(CALL_DURATION_FORMAT));
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(PropertiesUtil.getStrPro(CALL_TIME_FORMAT));
 
         while (true) {
             String caller = phoneNumbers.get(random.nextInt(callers.size()));
-//        String callerName = callers.get(caller);
             String callee;
 
             while (true) {
@@ -62,20 +67,17 @@ public class App {
                 }
             }
 
-//        String calleeName = callers.get(callee);
             // 通话时长，不超过十分钟,设置三位数格式
-            DecimalFormat decimalFormat = new DecimalFormat("000");
-            String duration = decimalFormat.format(random.nextInt(60 * 10) + 1);
+            String duration = decimalFormat.format(random.nextInt(PropertiesUtil.getIntPro(CALL_DURATION_MAX)) + 1);
 
             // 通话时间设置,转换成日期格式
             Calendar calendar = Calendar.getInstance();
-            calendar.set(Calendar.YEAR, 2018);
+            calendar.set(Calendar.YEAR, PropertiesUtil.getIntPro(CALL_YEAR));
             calendar.set(Calendar.MONTH, random.nextInt(12));
             calendar.set(Calendar.DAY_OF_MONTH, random.nextInt(29) + 1);
             calendar.set(Calendar.HOUR_OF_DAY, random.nextInt(24));
             calendar.set(Calendar.MINUTE, random.nextInt(60));
             calendar.set(Calendar.SECOND, random.nextInt(60));
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
             Date callTime = calendar.getTime();
             Date now = new Date();
 
@@ -84,13 +86,13 @@ public class App {
             }
 
             String callDate = simpleDateFormat.format(callTime);
-
-//        String callLog = caller + "," + callerName + "," + callee + "," + calleeName + "," + callDate + "," + duration;
             String callLog = caller + "," + callee + "," + callDate + "," + duration;
+
             System.out.println(callLog);
             fileWriter.write(callLog + "\r\n");
             fileWriter.flush();
-            Thread.sleep(200);
+
+            Thread.sleep(PropertiesUtil.getIntPro(GEN_DATA_INTERVAL_MS));
         }
     }
 

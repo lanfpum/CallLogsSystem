@@ -25,6 +25,15 @@ public class CallLog {
         this.callDuration = callDuration;
     }
 
+    public CallLog(String caller, String callee, String callTime, String callDuration, String callerName, String calleeName) {
+        this.caller = caller;
+        this.callee = callee;
+        this.callTime = callTime;
+        this.callDuration = callDuration;
+        this.callerName = callerName;
+        this.calleeName = calleeName;
+    }
+
     public String getCallerName() {
         return callerName;
     }

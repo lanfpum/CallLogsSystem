@@ -42,26 +42,32 @@ public class PersonServiceImplTest {
     }
 
     @Test
-    public void test1(){
+    public void test1() {
         ApplicationContext ac = new ClassPathXmlApplicationContext("beans.xml");
         PersonService ps = (PersonService) ac.getBean("personService");
-        for(Map.Entry<String,String> e : callers.entrySet()){
-            Person p = new Person(e.getValue(),e.getKey());
+        for (Map.Entry<String, String> e : callers.entrySet()) {
+            Person p = new Person(e.getValue(), e.getKey());
             System.out.println(p.getName() + p.getPhone());
             ps.insert(p);
         }
     }
 
     @Test
-    public void testFindAll(){
+    public void testFindAll() {
         ApplicationContext ac = new ClassPathXmlApplicationContext("beans.xml");
         PersonService ps = (PersonService)ac.getBean("personService");
         List<Person> list = ps.selectAll();
         String json = JSONArray.toJSONString(list);
-        json = JSON.toJSONString(list) ;
+        json = JSON.toJSONString(list);
         System.out.println(json);
     }
 
+    @Test
+    public void testFindNameByPhone() {
+        ApplicationContext ac = new ClassPathXmlApplicationContext("beans.xml");
+        PersonService ps = (PersonService) ac.getBean("personService");
+        System.out.println(ps.findNameByPhone("13269361119"));
+    }
 
 
 }
