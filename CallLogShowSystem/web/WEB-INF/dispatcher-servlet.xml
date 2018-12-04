@@ -19,7 +19,6 @@
     <mvc:resources mapping="/images/**" location="/images/"/>
     <mvc:resources mapping="/html/**" location="/html/"/>
 
-
     <!-- 内部资源视图解析器 -->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/"/>

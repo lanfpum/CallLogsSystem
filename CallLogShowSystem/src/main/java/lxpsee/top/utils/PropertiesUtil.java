@@ -1,6 +1,5 @@
-package lxpsee.top;
+package lxpsee.top.utils;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -15,10 +14,10 @@ public class PropertiesUtil {
 
     static {
         try {
-            InputStream kafkaInput = ClassLoader.getSystemResourceAsStream("kafka.properties");
+            InputStream inputStream = ClassLoader.getSystemResourceAsStream("udpre.properties");
             properties = new Properties();
-            properties.load(kafkaInput);
-        } catch (IOException e) {
+            properties.load(inputStream);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -34,19 +33,5 @@ public class PropertiesUtil {
     public static int getIntPro(String key) {
         return Integer.parseInt(properties.getProperty(key));
     }
-
-    /*public static void printInfo(String msg) {
-        try {
-            String ip = InetAddress.getLocalHost().getHostAddress();
-            Socket socket = new Socket("192.168.217.205", 8888);
-            OutputStream out = socket.getOutputStream();
-            out.write((ip + " : " + msg + "\r\n").getBytes());
-            out.flush();
-            out.close();
-            socket.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }*/
 
 }

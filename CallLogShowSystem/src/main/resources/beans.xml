@@ -25,7 +25,9 @@
     </aop:config>
 
     <!-- 扫描包 -->
-    <context:component-scan base-package="lxpsee.top.service,lxpsee.top.dao,lxpsee.top.hive"/>
+    <context:component-scan
+            base-package="lxpsee.top.service,lxpsee.top.dao,lxpsee.top.hive,lxpsee.top.monitor,lxpsee.top.utils"/>
+    <!--<context:component-scan base-package="lxpsee.top"/>-->
 
     <!-- 数据源 -->
     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">

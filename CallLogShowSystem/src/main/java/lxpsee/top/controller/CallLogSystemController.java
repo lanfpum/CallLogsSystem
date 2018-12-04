@@ -3,6 +3,7 @@ package lxpsee.top.controller;
 import com.alibaba.fastjson.JSON;
 import lxpsee.top.domain.CallLog;
 import lxpsee.top.domain.CallLogRange;
+import lxpsee.top.domain.StatCallLog;
 import lxpsee.top.hive.HiveCallLogService;
 import lxpsee.top.service.CallLogService;
 import lxpsee.top.utils.CallLogUtil;
@@ -30,6 +31,25 @@ public class CallLogSystemController {
     private CallLogService     callLogService;
     @Resource(name = "hiveCallLogService")
     private HiveCallLogService hiveCallLogService;
+
+    /**
+     * 跳转到统计指定人员，指定月份的通话次数页面
+     */
+    @RequestMapping("/toStatCallLog")
+    public String totoStatCallLogPage() {
+        return "callLog/statCallLog";
+    }
+
+    /**
+     * 统计指定人员，指定月份的通话次数
+     */
+    @RequestMapping("/statCallLog")
+    public String statCallLog(@RequestParam("caller") String caller, @RequestParam("year") String year, Model model) {
+        List<StatCallLog> statCallLogs = hiveCallLogService.findStatCallLogsByPhoneAndYear(caller, year);
+        model.addAttribute("title", caller + "在" + year + "年各月份通话次数统计");
+        model.addAttribute("list", statCallLogs);
+        return "callLog/statCallLog";
+    }
 
     /**
      * ajax 获取hbase数据库中的数据，json返回

@@ -4,6 +4,7 @@ import kafka.consumer.Consumer;
 import kafka.consumer.ConsumerConfig;
 import kafka.consumer.ConsumerIterator;
 import kafka.consumer.KafkaStream;
+import lxpsee.top.udb.HeartBeatThread;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +18,8 @@ import java.util.Map;
  */
 public class HBaseConsumer {
     public static void main(String[] args) {
+        new HeartBeatThread().start();
+
         ConsumerConfig consumerConfig = new ConsumerConfig(PropertiesUtil.properties);
         String topic = PropertiesUtil.getPro("topic");
         Map<String, Integer> map = new HashMap<String, Integer>();
@@ -33,6 +36,7 @@ public class HBaseConsumer {
                 byte[] message = iterator.next().message();
                 msg = new String(message);
                 hBaseDao.put(msg);
+//                PropertiesUtil.printInfo("after put :" + msg);
             }
         }
     }

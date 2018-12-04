@@ -1,6 +1,7 @@
 package lxpsee.top.hive;
 
 import lxpsee.top.domain.CallLog;
+import lxpsee.top.domain.StatCallLog;
 
 import java.util.List;
 
@@ -10,4 +11,6 @@ import java.util.List;
  */
 public interface HiveCallLogService {
     public List<CallLog> findLatestCallLog(String selectPhoneNum, int selectNum);
+
+    public List<StatCallLog> findStatCallLogsByPhoneAndYear(String caller, String year);
 }

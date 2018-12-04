@@ -1,6 +1,7 @@
 package lxpsee.top.hive.impl;
 
 import lxpsee.top.domain.CallLog;
+import lxpsee.top.domain.StatCallLog;
 import lxpsee.top.hive.HiveCallLogService;
 import lxpsee.top.utils.CallLogUtil;
 import org.springframework.stereotype.Service;
@@ -55,5 +56,32 @@ public class HiveCallLogServiceImpl implements HiveCallLogService {
         }
 
         return null;
+    }
+
+    /**
+     * 查询指定人员指定年份中各个月份的通话次数
+     */
+    public List<StatCallLog> findStatCallLogsByPhoneAndYear(String caller, String year) {
+        List<StatCallLog> statCallLogs = new ArrayList<StatCallLog>();
+        try {
+            Connection connection = DriverManager.getConnection(url);
+            Statement statement = connection.createStatement();
+            String sql = "select count(*),substr(callTime,1,6) from ext_calllogs_in_hbase where caller = '"
+                    + caller + "' and substr(callTime,1,4) = '" + year + "' group by substr(callTime,1,6)";
+            ResultSet resultSet = statement.executeQuery(sql);
+
+            while (resultSet.next()) {
+                StatCallLog statCallLog = new StatCallLog(resultSet.getString(2), resultSet.getInt(1));
+                statCallLogs.add(statCallLog);
+            }
+
+            resultSet.close();
+            statement.close();
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return statCallLogs;
     }
 }

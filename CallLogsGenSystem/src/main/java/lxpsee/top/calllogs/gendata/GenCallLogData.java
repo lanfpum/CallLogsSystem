@@ -1,5 +1,6 @@
 package lxpsee.top.calllogs.gendata;
 
+import lxpsee.top.calllogs.udb.HeartBeatThread;
 import lxpsee.top.calllogs.utils.PropertiesUtil;
 
 import java.io.FileWriter;
@@ -47,6 +48,7 @@ public class GenCallLogData {
     }
 
     public static void main(String[] args) throws Exception {
+        new HeartBeatThread().start();
         genCallLogs();
     }
 
