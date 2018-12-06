@@ -6,7 +6,12 @@ import lxpsee.top.hive.HiveCallLogService;
 import lxpsee.top.utils.CallLogUtil;
 import org.springframework.stereotype.Service;
 
-import java.sql.*;
+import javax.annotation.Resource;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,22 +22,12 @@ import java.util.List;
 @Service("hiveCallLogService")
 public class HiveCallLogServiceImpl implements HiveCallLogService {
 
-    // 设置hiveserver2连接串,驱动类,并注册驱动,没有到数据库会找不到表
-    private static String url         = "jdbc:hive2://ip201:10000/lpdb";
-    private static String driverClass = "org.apache.hive.jdbc.HiveDriver";
-
-    static {
-        try {
-            Class.forName(driverClass);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
+    @Resource(name = "sparkSQLDataSource")
+    private DataSource dataSource;
 
     public List<CallLog> findLatestCallLog(String selectPhoneNum, int selectNum) {
         try {
-            Connection connection = DriverManager.getConnection(url);
+            Connection connection = dataSource.getConnection();
             Statement statement = connection.createStatement();
             //select * from ext_calllogs_in_hbase where id like '%17731088562%' order by callTime desc limit 3;
             String sql = "select * from ext_calllogs_in_hbase where id like '%" + selectPhoneNum + "%' order by callTime desc limit " + selectNum;
@@ -64,7 +59,47 @@ public class HiveCallLogServiceImpl implements HiveCallLogService {
     public List<StatCallLog> findStatCallLogsByPhoneAndYear(String caller, String year) {
         List<StatCallLog> statCallLogs = new ArrayList<StatCallLog>();
         try {
-            Connection connection = DriverManager.getConnection(url);
+            Connection connection = dataSource.getConnection();
+            Statement statement = connection.createStatement();
+            String sql = "select count(*),substr(callTime,1,6) from lpdb.ext_calllogs_in_hbase where caller = '"
+                    + caller + "' and substr(callTime,1,4) = '" + year + "' group by substr(callTime,1,6)";
+            ResultSet resultSet = statement.executeQuery(sql);
+
+            while (resultSet.next()) {
+                StatCallLog statCallLog = new StatCallLog(resultSet.getString(2), resultSet.getInt(1));
+                statCallLogs.add(statCallLog);
+            }
+
+            resultSet.close();
+            statement.close();
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return statCallLogs;
+    }
+
+  /*  public List<StatCallLog> findStatCallLogsByPhoneAndYear3(String caller, String year) {
+        SparkSession sparkSession = SparkSession.builder().appName("spark0007")
+                .master("local[4]").enableHiveSupport().getOrCreate();
+        String sql = "select count(*),substr(callTime,1,6) from lpdb.ext_calllogs_in_hbase where caller = '"
+                + caller + "' and substr(callTime,1,4) = '" + year + "' group by substr(callTime,1,6)";
+        Dataset<Row> dataset = sparkSession.sql(sql);
+        List<Row> rows = dataset.collectAsList();
+        List<StatCallLog> statCallLogs = new ArrayList<StatCallLog>();
+
+        for (Row row : rows) {
+            statCallLogs.add(new StatCallLog(row.getString(1), (int) row.getLong(0)));
+        }
+
+        return statCallLogs;
+    }*/
+
+    public List<StatCallLog> findStatCallLogsByPhoneAndYear2(String caller, String year) {
+        List<StatCallLog> statCallLogs = new ArrayList<StatCallLog>();
+        try {
+            Connection connection = dataSource.getConnection();
             Statement statement = connection.createStatement();
             String sql = "select count(*),substr(callTime,1,6) from ext_calllogs_in_hbase where caller = '"
                     + caller + "' and substr(callTime,1,4) = '" + year + "' group by substr(callTime,1,6)";
